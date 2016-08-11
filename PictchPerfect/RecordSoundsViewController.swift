@@ -39,17 +39,8 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-
     @IBAction func recordAudio() {
-        recordingLabel.text = "Recording in progress"
-        recordButton.enabled = false
-        stopRecordButton.enabled = true
-        
+        setUIState(true, recordingText: "Recording in progress")
         
         let dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory,.UserDomainMask, true)[0] as String
         let recordingName = "recordedVoice.wav"
@@ -68,25 +59,24 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @IBAction func stopRecording() {
-        recordingLabel.text = "Tap to Record"
-        stopRecordButton.enabled = false
-        recordButton.enabled = true
+        setUIState(false, recordingText: "Tap to Record")
         
         audioRecorder.stop()
         let session = AVAudioSession.sharedInstance()
         try! session.setActive(false)
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
+    private func setUIState(isRecording : Bool, recordingText: String) {
+        recordingLabel.text = recordingText
+        recordButton.enabled = !isRecording
+        stopRecordButton.enabled = isRecording
     }
     
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
-        //print("finish audio record")
         if flag {
             performSegueWithIdentifier("record to play", sender: audioRecorder.url)
         } else {
+            displayAlert("Error", messageText: "Failed to record")
             print("failed to record")
         }
     }
@@ -97,6 +87,12 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
             let recordedAudioURL = sender as! NSURL
             playSoundsVC.recordedAudioURL = recordedAudioURL
         }
+    }
+    
+    func displayAlert(messageTitle: String, messageText: String) {
+        let alert = UIAlertController(title: messageTitle, message:messageText, preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
 }
 
