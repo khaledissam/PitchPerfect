@@ -19,6 +19,7 @@
 // 10. Button tag
 // 11. MARK: function
 // 12. if let can use same name
+// 13. Stack view for different device size
 
 
 import UIKit
